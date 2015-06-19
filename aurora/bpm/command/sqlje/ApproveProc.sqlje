@@ -7,6 +7,10 @@ import aurora.bpm.command.beans.*;
 
 public class ApproveProc {
 
+	public static final String REJECT = "REJECT";
+	public static final String AGREE = "AGREE";
+	public static final String WAIT = "";
+
 	public BpmnUsertaskNode queryByRecipientRecordId(Long record_id) throws Exception{
 		BpmnUsertaskNode bun=#{
 			select * from bpmn_usertask_node
@@ -53,19 +57,25 @@ public class ApproveProc {
 		//删除接收者记录
 		#{delete from bpmn_instance_node_recipient where record_id=${rcpt_record_id}};
 		
-		if(!in(action_code,"AGREE","REJECT")) {
+		if(!in(action_code,AGREE,REJECT)) {
 			System.out.println("工作流审批 : 动作为自定义"+action_code+",直接返回.");
 			return action_code;
 		}
 		
 		BpmnUsertaskNode bun = #{select * from bpmn_usertask_node where usertask_id=${usertask_id}};
 		if(in(bun.approval_type,0L,1L,2L,4L,7L)) {
-			return approveByApproverCount(instance_id, usertask_id, bun);
+			String ret = approveByApproverCount(instance_id, usertask_id, bun);
+			if(!WAIT.equals(ret)) {
+				#{delete from bpmn_instance_node_recipient r
+					where r.instance_id=${instance_id} 
+					  and r.usertask_id=${usertask_id}};
+			}
+			return ret;
 		}
 		
 		
 		
-		return "";
+		return WAIT;
 	}
 
 	public Long createApproveRecord(Long instance_id, Long usertask_id,
@@ -87,9 +97,9 @@ public class ApproveProc {
 	/**
 	 * 按人数审批<br>
 	 * 
-	 * @return 返回 -1,审批拒绝<br>
-	 *         返回 1,审批通过<br>
-	 *         返回 0,审批尚未得出结果,需等待其他审批人
+	 * @return 返回 REJECT,审批拒绝<br>
+	 *         返回 AGREE,审批通过<br>
+	 *         返回 "",审批尚未得出结果,需等待其他审批人
 	 * 
 	 */
 	private String approveByApproverCount(Long instance_id,Long usertask_id,BpmnUsertaskNode bun) throws Exception {
@@ -100,14 +110,14 @@ public class ApproveProc {
 					and usertask_id=${usertask_id}
 					and coalesce(disabled_flag,'N')='N' };
 		//取得审批拒绝的人数
-		Long terminate_count=#{
+		Long reject_count=#{
 				select count(1) from bpmn_approve_record r
 					where r.instance_id=${instance_id}
 					and r.usertask_id=${usertask_id}
 					and r.action_token='REJECT'
 					and coalesce(disabled_flag,'N')='N'};
 		//取得审批通过的人数
-		Long passed_count = #{
+		Long agree_count = #{
 				select count(1) from bpmn_approve_record r
 					where r.instance_id=${instance_id}
 					and r.usertask_id = ${usertask_id}
@@ -117,53 +127,53 @@ public class ApproveProc {
 		Long quantity = nvl(bun.quantity,0L);
 		if(bun.approval_type == 0) {
 			//单人审批: 拒绝人数和总人数相同，则说明所有人都拒绝
-			if(terminate_count == all_approver_count)
-				return "REJECT";
+			if(reject_count == all_approver_count)
+				return REJECT;
 		}else if(bun.approval_type == 1) {
 			//全部审批 1
 		    //如果有1人拒绝则终止
-			if(terminate_count > 0)
-				return "REJECT";
+			if(reject_count > 0)
+				return REJECT;
 		} else if(bun.approval_type == 2) {
 			//一定比例2
 			//拒绝的比例 > (1 - 审批通过的比例) , 则终止
 			if(all_approver_count == 0)
-				return "REJECT";
-			if(terminate_count * 100d / all_approver_count > (100 - quantity))
-				return "REJECT";
-			if(passed_count * 100d / all_approver_count > quantity)
-				return "AGREE";
+				return REJECT;
+			if(reject_count * 100d / all_approver_count > (100 - quantity))
+				return REJECT;
+			if(agree_count * 100d / all_approver_count > quantity)
+				return AGREE;
 		} else if(bun.approval_type == 4) {
 			//一定人数3
 			//拒绝的人数 > (总数 - 审批通过的人数)
-			if(terminate_count > (all_approver_count - quantity))
-				return "REJECT";
-			if(passed_count > quantity)
-				return "AGREE";
+			if(reject_count > (all_approver_count - quantity))
+				return REJECT;
+			if(agree_count > quantity)
+				return AGREE;
 		}else if(bun.approval_type == 6) {
 			//一票通过/拒绝
-			if(terminate_count > 0 && passed_count > 0)
+			if(reject_count > 0 && agree_count > 0)
 				System.err.println("一票通过/拒绝 数据异常");
-			if(terminate_count > 0)
-				return "REJECT";
-			if(passed_count > 0)
-				return "AGREE";
+			if(reject_count > 0)
+				return REJECT;
+			if(agree_count > 0)
+				return AGREE;
 		}
 		
 		//都拒绝时,拒绝,都通过时,通过
-		if(terminate_count == all_approver_count)
-			return "REJECT";
-		else if(passed_count == all_approver_count)
-			return "AGREE";
-		return "";
+		if(reject_count == all_approver_count)
+			return REJECT;
+		else if(agree_count == all_approver_count)
+			return AGREE;
+		return WAIT;
 	}
 
 	private Long approveByRuleCount() throws Exception {
 		return 1L;
 	}
 
-	public Long checkApproveValidation(Long rcpt_record_id,
-			String action_code, Long user_id) throws Exception {
+	public Long checkApproveValidation(Long rcpt_record_id, String action_code,
+			Long user_id) throws Exception {
 		return 1L;
 	}
 

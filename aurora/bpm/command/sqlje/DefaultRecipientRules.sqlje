@@ -226,20 +226,55 @@ public class DefaultRecipientRules {
 	 */
 	public void getEmployeeManager(String param1, String param2, String param3,
 			String param4, Long rule_record_id) throws Exception {
-
+		BpmnInstanceNodeRule node_rule = #{select * from bpmn_instance_node_rule where rule_record_id=${rule_record_id}};
+		Long company_id = getInstanceCompany(node_rule.instance_id);
+		List<Long> document_positions = getDocumentPosition(node_rule.instance_id);
+		if(document_positions.size() == 0) {
+			return;
+		}
+		
+		for(Long document_position_id : document_positions) {
+			for(Long parent_position : #{select parent_position_id from wfl_position_v where position_id=${document_position_id} 
+									}) {
+				for(Long approver_id : #{SELECT DISTINCT u.user_id
+                              FROM wfl_employee_assigns_v a, wfl_users_v u
+                             WHERE a.position_id = ${parent_position}
+                               AND a.employee_id = u.employee_id
+                               AND a.company_id = ${company_id}}) {
+					insertBpmInstanceNodeHirc(node_rule.recipient_sequence,
+							approver_id,
+							"",
+							rule_record_id,
+							null,
+							1L,
+							null);
+				}
+			}
+		}
 	}
 
-	/**
-	 * 取得申请者间接主管
-	 */
-	public void getEmployeeIndirectManager(String param1, String param2,
-			String param3, String param4, Long rule_record_id) throws Exception {
-
-	}
 
 	public void getEmployeeCompanyManager(String param1, String param2,
 			String param3, String param4, Long rule_record_id) throws Exception {
-
+		BpmnInstanceNodeRule node_rule = #{select * from bpmn_instance_node_rule where rule_record_id=${rule_record_id}};
+		Long company_id = getInstanceCompany(node_rule.instance_id);
+		for(Long chief_position :#{SELECT chief_position_id
+                               FROM wfl_companies_v
+                              WHERE company_id = ${company_id}}) {
+			for(Long approver_id:#{SELECT DISTINCT u.user_id
+                            FROM wfl_employee_assigns_v a, wfl_users_v u
+                           WHERE a.position_id = ${chief_position}
+                             AND a.employee_id = u.employee_id
+                             AND a.company_id = ${company_id}}) {
+				insertBpmInstanceNodeHirc(node_rule.recipient_sequence,
+						approver_id,
+						"",
+						rule_record_id,
+						null,
+						1L,
+						null);
+			}
+		}
 	}
 
 	/**

@@ -6,8 +6,8 @@ import aurora.bpm.command.beans.*;
 
 public class ProcessLogProc {
 
-	public void log(Long instance_id, Long user_id, String event_type,
-			String log_content) throws Exception {
+	public synchronized void log(Long instance_id, Long user_id,
+			String event_type, String log_content) throws Exception {
 		ProcessLog data = new ProcessLog();
 		data.instance_id = instance_id;
 		data.user_id = user_id;
@@ -43,7 +43,7 @@ public class ProcessLogProc {
 		public String event_type;
 		public String log_content;
 		@InsertExpression("CURRENT_TIMESTAMP")
-		public java.sql.Timestamp log_date;
+		public java.sql.Date log_date;
 	}
 
 }

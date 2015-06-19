@@ -1,6 +1,6 @@
 package aurora.bpm.command.beans;
 import aurora.sqlje.core.annotation.*;
-@Table(name="BPMN_INSTANCE_NODE_RECIPIENT",stdwho=false)
+@Table(name="BPMN_INSTANCE_NODE_RECIPIENT",stdwho=true)
 public class BpmnInstanceNodeRecipient
 {
 	/**审批记录ID*/

@@ -1,6 +1,6 @@
 package aurora.bpm.command.beans;
 import aurora.sqlje.core.annotation.*;
-@Table(name="BPMN_DOCUMENT_REFERENCE",stdwho=false)
+@Table(name="BPMN_DOCUMENT_REFERENCE",stdwho=true)
 public class BpmnDocumentReference
 {
 	@PK

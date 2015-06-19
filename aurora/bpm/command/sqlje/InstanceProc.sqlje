@@ -5,15 +5,16 @@ import uncertain.composite.*;
 import aurora.bpm.command.sqlje.*;
 import aurora.bpm.command.beans.*;
 
-
 public class InstanceProc {
 	public Long create(String code,String version,Long parent_id,Long instance_param) throws Exception {
+		String desc = #{select description from bpmn_process_define d where d.process_code = ${code} and d.process_version=${version}};
 		BpmnProcessInstance bpi = new BpmnProcessInstance();
 		bpi.status="RUNNING";
 		bpi.process_code=code;
 		bpi.process_version = version;   
 		bpi.parent_id=parent_id;
 		bpi.instance_param = instance_param;
+		bpi.description = desc;
 		$sql.insert(bpi);
 		
 		//get parameters defined in bmpn_document_reference,put them into $data as default datas

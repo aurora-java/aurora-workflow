@@ -1,6 +1,6 @@
 package aurora.bpm.command.beans;
 import aurora.sqlje.core.annotation.*;
-@Table(name="BPMN_INSTANCE_NODE_RULE",stdwho=false)
+@Table(name="BPMN_INSTANCE_NODE_RULE",stdwho=true)
 public class BpmnInstanceNodeRule
 {
 	/**审批规则ID*/

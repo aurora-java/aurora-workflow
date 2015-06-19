@@ -71,6 +71,7 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 		conn.setAutoCommit(false);
 		ISqlCallStack callStack = new SqlCallStack(ds, conn);
 		CompositeMap contextData = new CompositeMap("context");
+		contextData.createChild("session");
 		callStack.setContextData(contextData);
 		return callStack;
 	}
@@ -90,6 +91,9 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 	@Override
 	public void execute(Command cmd) throws Exception {
 		ISqlCallStack callStack = createSqlCallStack();
+		CompositeMap session=callStack.getContextData().getChild("session");
+		session.put("user_id", cmd.getOptions().getString("user_id"));
+		session.put("lang", cmd.getOptions().getString("lang"));
 		try {
 			Long instance_id = cmd.getOptions().getLong(INSTANCE_ID);
 			boolean running = true;

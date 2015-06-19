@@ -1,6 +1,6 @@
 package aurora.bpm.command.beans;
 import aurora.sqlje.core.annotation.*;
-@Table(name="BPMN_APPROVE_RECORD",stdwho=false)
+@Table(name="BPMN_APPROVE_RECORD",stdwho=true)
 public class BpmnApproveRecord
 {
 	/**审批记录ID*/

@@ -47,7 +47,7 @@ public class ApproveCmdExecutor extends AbstractCommandExecutor {
 
 		String result = appr.approve(instance_id, recipient_record, user_id,
 				action_code, approve_content);
-		if (eq(result, "")) {
+		if (eq(result, ApproveProc.WAIT)) {
 			System.out
 					.printf("[usertask]%s approve not complete yet,wait ...\n",
 							node_id);
@@ -74,7 +74,7 @@ public class ApproveCmdExecutor extends AbstractCommandExecutor {
 		// return;
 		// }
 
-		if (!eq(result, "REJECT")) {
+		if (!eq(result, ApproveProc.REJECT)) {
 			System.out.printf("[usertask]%s approve %s\n", node_id, result);
 			createOutgoingPath(callStack, userTask, cmd);
 		} else {

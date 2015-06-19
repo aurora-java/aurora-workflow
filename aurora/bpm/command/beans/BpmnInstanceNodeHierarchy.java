@@ -1,6 +1,6 @@
 package aurora.bpm.command.beans;
 import aurora.sqlje.core.annotation.*;
-@Table(name="BPMN_INSTANCE_NODE_HIERARCHY",stdwho=false)
+@Table(name="BPMN_INSTANCE_NODE_HIERARCHY",stdwho=true)
 public class BpmnInstanceNodeHierarchy
 {
 	/**审批层次记录ID*/

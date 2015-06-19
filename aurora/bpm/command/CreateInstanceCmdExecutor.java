@@ -5,6 +5,7 @@ import org.eclipse.bpmn2.StartEvent;
 
 import uncertain.composite.CompositeMap;
 import aurora.bpm.command.sqlje.InstanceProc;
+import aurora.bpm.command.sqlje.ProcessLogProc;
 import aurora.database.service.IDatabaseServiceFactory;
 import aurora.sqlje.core.ISqlCallStack;
 
@@ -27,10 +28,14 @@ public class CreateInstanceCmdExecutor extends AbstractCommandExecutor {
 		Long instance_param = options.getLong("instance_param");
 		InstanceProc ci = createProc(InstanceProc.class, callStack);
 		Long instance_id = ci.create(options.getString(PROCESS_CODE), version,
-				parent_id,instance_param);
+				parent_id, instance_param);
 		cmd.getOptions().put(INSTANCE_ID, instance_id);// set new instance_id
 														// back
 		System.out.println("instance created ,id:" + instance_id);
+
+		ProcessLogProc logger = getExecutorContext().getLogger();
+		logger.log(instance_id, cmd.getOptions().getLong("user_id"),
+				"STARTEVENT", "process instance created");
 		loadDataObject(ci, instance_id, callStack);
 		for (FlowElement fe : process.getFlowElements()) {
 			if (fe instanceof StartEvent) {

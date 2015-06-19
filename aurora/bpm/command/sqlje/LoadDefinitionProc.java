@@ -10,7 +10,7 @@ import aurora.sqlje.core.*;
 
 public class LoadDefinitionProc implements aurora.sqlje.core.ISqlCallEnabled {
 	public String loadFromDb(String code, String version) throws Exception {
-		String _$sqlje_sql_gen2 = "\n\t\t\t select defines \n\t\t\t   from bpmn_process_define \n\t\t\t  where current_version_flag='Y' \n\t\t\t\tand approve_status='APPROVED' \n\t\t\t\tand valid_flag='Y' \n\t\t\t\tand process_code = ?\n\t\t\t\tand process_version = ?";
+		String _$sqlje_sql_gen2 = "\n\t\t\t\t select defines \n\t\t\t\t   from bpmn_process_define \n\t\t\t\t  where process_code = ?\n\t\t\t\t\tand process_version = ?";
 		PreparedStatement _$sqlje_ps_gen1 = getSqlCallStack()
 				.getCurrentConnection().prepareStatement(_$sqlje_sql_gen2);
 		_$sqlje_ps_gen1.setString(1, code);
@@ -29,19 +29,19 @@ public class LoadDefinitionProc implements aurora.sqlje.core.ISqlCallEnabled {
 	protected aurora.sqlje.core.ISqlCallStack _$sqlje_sqlCallStack = null;
 	protected SqlFlag $sql = new SqlFlag(this);
 
-	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
-		_$sqlje_sqlCallStack = args0;
-	}
-
-	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
-		_$sqlje_instanceManager = args0;
+	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
+		return _$sqlje_sqlCallStack;
 	}
 
 	public aurora.sqlje.core.IInstanceManager getInstanceManager() {
 		return _$sqlje_instanceManager;
 	}
 
-	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
-		return _$sqlje_sqlCallStack;
+	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
+		_$sqlje_instanceManager = args0;
+	}
+
+	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
+		_$sqlje_sqlCallStack = args0;
 	}
 }

@@ -21,7 +21,7 @@ public class BeanGenerater {
 		URL url = BeanGenerater.class.getResource("BeanGenerater.class");
 		dir = new File(url.getFile()).getParentFile();
 		//dir = new File("/Users/jessen/work/Workspaces/WEB/HAP_Blue/src/fnd");
-		new BeanGenerater().gen("bpmn_usertask_node");
+		new BeanGenerater().gen("sys_session");
 	}
 
 	void gen(String tableName) throws Exception {
@@ -31,8 +31,8 @@ public class BeanGenerater {
 			printHeaderInfo(tableName);
 			getTableInfo(conn, tableName);
 			System.out.println(buff);
-			Files.write(Paths.get(dir.getAbsolutePath(), className + ".java"),
-					Arrays.asList(buff.toString().split("\\n")));
+//			Files.write(Paths.get(dir.getAbsolutePath(), className + ".java"),
+//					Arrays.asList(buff.toString().split("\\n")));
 		} finally {
 			closeConnection(conn);
 		}
@@ -78,9 +78,12 @@ public class BeanGenerater {
 
 	Connection getConnection() throws Exception {
 		Class.forName("com.mysql.jdbc.Driver");
+//		return DriverManager.getConnection(
+//				"jdbc:mysql://172.20.0.38:3306/aurora_workflow", "bpmn_dev",
+//				"bpmn_dev");
 		return DriverManager.getConnection(
-				"jdbc:mysql://172.20.0.38:3306/aurora_workflow", "bpmn_dev",
-				"bpmn_dev");
+				"jdbc:mysql://172.20.0.38:3306/masdev", "hap_dev",
+				"hap_dev");
 	}
 
 	void closeConnection(Connection conn) {

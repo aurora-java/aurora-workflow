@@ -1,11 +1,11 @@
 package aurora.bpm.command;
 
 import aurora.bpm.command.sqlje.InstanceProc;
+import aurora.bpm.command.sqlje.ProcessLogProc;
 import aurora.database.service.IDatabaseServiceFactory;
 import aurora.sqlje.core.ISqlCallStack;
 
 public class EndEventExecutor extends AbstractCommandExecutor {
-	
 
 	public EndEventExecutor(IDatabaseServiceFactory dsf) {
 		super(dsf);
@@ -14,11 +14,14 @@ public class EndEventExecutor extends AbstractCommandExecutor {
 	@Override
 	public void executeWithSqlCallStack(ISqlCallStack callStack, Command cmd)
 			throws Exception {
-		System.out.println("[End Event]"+cmd.getOptions().getString("node_id")+"  reached");
-		Long instance_id = cmd.getOptions()
-				.getLong(INSTANCE_ID);
+		System.out.println("[End Event]"
+				+ cmd.getOptions().getString("node_id") + "  reached");
+		Long instance_id = cmd.getOptions().getLong(INSTANCE_ID);
 		InstanceProc inst = createProc(InstanceProc.class, callStack);
 		inst.finish(instance_id);
+		ProcessLogProc logger = getExecutorContext().getLogger();
+		logger.log(instance_id, cmd.getOptions().getLong("user_id"),
+				"ENDEVENT", "process instance finished");
 	}
 
 }

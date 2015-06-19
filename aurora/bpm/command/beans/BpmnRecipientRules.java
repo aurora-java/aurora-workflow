@@ -1,6 +1,6 @@
 package aurora.bpm.command.beans;
 import aurora.sqlje.core.annotation.*;
-@Table(name="BPMN_RECIPIENT_RULES",stdwho=false)
+@Table(name="BPMN_RECIPIENT_RULES",stdwho=true)
 public class BpmnRecipientRules
 {
 	@PK

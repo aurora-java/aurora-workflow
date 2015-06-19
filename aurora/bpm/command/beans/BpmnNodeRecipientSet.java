@@ -1,6 +1,6 @@
 package aurora.bpm.command.beans;
 import aurora.sqlje.core.annotation.*;
-@Table(name="BPMN_NODE_RECIPIENT_SET",stdwho=false)
+@Table(name="BPMN_NODE_RECIPIENT_SET",stdwho=true)
 public class BpmnNodeRecipientSet
 {
 	/**RECIPIENT_SET_ID*/
