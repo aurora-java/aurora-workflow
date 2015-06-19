@@ -57,11 +57,11 @@ public class UserTaskProc {
 		//系统级审批规则
 	}
 
-	public Long insertBpmInstanceNodeRule(Long instance_id,
-			Long usertask_id, String recipient_type, Long recipient_set_id,
-			String rule_code, Long rule_sequence, Long recipient_sequence,
-			String param1, String param2, String param3, String param4,
-			String rule_type, Long user_id) throws Exception {
+	public Long insertBpmInstanceNodeRule(Long instance_id, Long usertask_id,
+			String recipient_type, Long recipient_set_id, String rule_code,
+			Long rule_sequence, Long recipient_sequence, String param1,
+			String param2, String param3, String param4, String rule_type,
+			Long user_id) throws Exception {
 		BpmnInstanceNodeRule rule = new BpmnInstanceNodeRule();
 		rule.instance_id = instance_id;
 		rule.usertask_id = usertask_id;
@@ -95,17 +95,11 @@ public class UserTaskProc {
 				else {
 					proc_name = #{select procedure_name from bpmn_recipient_rules where rule_code = ${recipient_rule.rule_code}};
 				}
-				Class<? extends ISqlCallEnabled> clazz=null;
 				int idx = proc_name.lastIndexOf('.');
 				String proc_class = proc_name.substring(0, idx);
 				String proc_method = proc_name.substring(idx+1);
-				try {
-					clazz = (Class<? extends ISqlCallEnabled>)Class.forName(proc_class);
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-				ISqlCallEnabled proc = getInstanceManager().createInstance(clazz,this);
-				java.lang.reflect.Method m = clazz.getMethod(proc_method,String.class,String.class,String.class,String.class,Long.class);
+				ISqlCallEnabled proc = getInstanceManager().createInstance(proc_class,this);
+				java.lang.reflect.Method m = proc.getClass().getMethod(proc_method,String.class,String.class,String.class,String.class,Long.class);
 				if(proc != null && m != null) {
 					System.out.println("execute proc:"+proc_name);
 					
@@ -254,7 +248,7 @@ public class UserTaskProc {
              and n.usertask_id = r.usertask_id
              and (n.can_auto_pass = 1 or n.is_self_re_commit = 1)
 		}) {
-			String auto_approve_flag="N";
+			String auto_approve_flag = "N";
 			Long can_auto_pass = recipient.getLong("can_auto_pass");
 			Long record_id = recipient.getLong("record_id");
 			if(can_auto_pass==1) {
@@ -293,6 +287,92 @@ public class UserTaskProc {
 			return true;
 		}
 		return false;
+	}
+
+	public void commision(CompositeMap param) throws Exception {
+		commision(param.getLong("record_id"), param.getLong("user_id"),
+				param.getString("delivercomment"));
+	}
+
+	/**
+	 * 工作流转交
+	 */
+	public void commision(Long rcpt_id,Long user_id,String comment) throws Exception{
+		CompositeMap c_rcpt = #{select r.instance_id,
+							       r.usertask_id,
+							       r.seq_number,
+							       r.date_limit,
+							       r.user_id,
+							       r.hierarchy_record_id,
+							       h.rule_record_id,
+							       h.rule_detail_id
+							  from bpmn_instance_node_recipient r
+							  left outer join bpmn_instance_node_hierarchy h
+							    on r.hierarchy_record_id = h.hierarchy_record_id
+							 where r.record_id = ${rcpt_id} };
+		Long instance_id = c_rcpt.getLong("instance_id");
+		Long usertask_id = c_rcpt.getLong("usertask_id");
+		Long seq_number = c_rcpt.getLong("seq_number");
+		Long user_id_from = c_rcpt.getLong("user_id");
+		Long rule_record_id = c_rcpt.getLong("rule_record_id");
+		Long rule_detail_id = c_rcpt.getLong("rule_detail_id");
+		DefaultRecipientRules def_rcpt_rule_proc = getInstanceManager().createInstance(DefaultRecipientRules.class,this);
+		Long hirc_id = def_rcpt_rule_proc.insertBpmInstanceNodeHirc(instance_id,
+								  usertask_id,
+								  seq_number,
+								  user_id,
+								  "Y",
+								  "N",
+								  "由" + user_id_from + "转交",
+								  rule_record_id,
+								  rule_detail_id,
+								  user_id_from,
+								  null);
+		//create recipient record
+		BpmnInstanceNodeRecipient binr = new BpmnInstanceNodeRecipient();
+		binr.instance_id = instance_id;
+		binr.usertask_id = usertask_id;
+		binr.seq_number = seq_number;
+		binr.user_id = user_id;
+		binr.commision_by = user_id_from;
+		binr.commision_desc = comment;
+		binr.hierarchy_record_id = hirc_id;
+		binr.attachment_id = c_rcpt.getLong("attachment_id");
+		binr.date_limit = (java.sql.Date)c_rcpt.get("date_limit");
+		$sql.insert(binr);
+		
+		CompositeMap c_approve_record = #{select  r.usertask_id,
+                                    i.instance_id,
+                                    r.seq_number,
+                                    r.user_id
+                               from bpmn_instance_node_recipient r,
+                                    bpmn_process_instance       i
+                              where r.record_id = ${rcpt_id}
+                                and r.instance_id = i.instance_id};
+		//create COMMISION record
+		BpmnApproveRecord bar = new BpmnApproveRecord();
+		bar.usertask_id = usertask_id;
+		bar.instance_id = instance_id;
+		bar.seq_number = seq_number;
+		bar.action_token = "COMMISION";
+		bar.comment_text = comment;
+		bar.rcpt_record_id = rcpt_id;
+		$sql.insert(bar);
+		
+		Long hir_rec_id = c_rcpt.getLong("hierarchy_record_id");
+		#{update bpmn_instance_node_hierarchy h 
+			set h.disabled_flag='Y',
+				h.note='COMMISION'
+			where h.hierarchy_record_id=${hir_rec_id} };
+		#{delete from bpmn_instance_node_recipient r where r.record_id=${rcpt_id}};
+		
+		//write log
+		ProcessLogProc.ProcessLog bpl = new ProcessLogProc.ProcessLog();
+		bpl.instance_id = instance_id;
+		bpl.user_id = user_id_from;
+		bpl.event_type = "COMMISION";
+		bpl.log_content = "工作流转交:rcpt_id=" + rcpt_id;
+		$sql.insert(bpl);
 	}
 
 	public static boolean eq(Object o1, Object o2) {
