@@ -1,19 +1,11 @@
-CREATE TABLE `bpmn_path_log` (
+CREATE TABLE `bpmn_process_log` (
   `log_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'PK',
   `instance_id` bigint(20) NOT NULL COMMENT '所属工作流ID',
-  `path_id` bigint(20) NOT NULL COMMENT '所属路径实例ID',
-  `log_date` datetime DEFAULT NULL COMMENT '发生时间',
-  `user_id` varchar(100) DEFAULT NULL COMMENT '触发该日志记录的用户ID',
-  `current_node` varchar(100) DEFAULT NULL COMMENT '当前所在节点',
-  `prev_node` varchar(100) DEFAULT NULL COMMENT '之前来自节点',
-  `event_type` varchar(100) DEFAULT NULL COMMENT '所发生日志的的类型',
+  `log_date` datetime DEFAULT NULL COMMENT '创建时间',
+  `user_id` varchar(45) DEFAULT NULL COMMENT '触发该日志记录的用户ID',
+  `event_type` varchar(45) DEFAULT NULL COMMENT '事件类型',
   `log_content` varchar(1000) DEFAULT NULL COMMENT '日志内容',
-  `created_by` bigint(20) DEFAULT NULL,
-  `creation_date` datetime NULL DEFAULT NULL,
-  `last_updated_by` bigint(20) DEFAULT NULL,
-  `last_update_date` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`log_id`),
-  KEY `BPMN_PATH_LOG_I2` (`path_id`),
-  KEY `BPMN_PATH_LOG_I3` (`log_date`),
-  KEY `BPMN_PATH_LOG_I1` (`instance_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=119 DEFAULT CHARSET=gb2312;
+  KEY `bpmn_process_log_n1` (`instance_id`),
+  KEY `bpmn_process_log_n2` (`log_date`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=gb2312;

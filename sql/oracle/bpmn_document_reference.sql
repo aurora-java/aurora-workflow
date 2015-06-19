@@ -1,8 +1,8 @@
 --create table
 CREATE TABLE BPMN_DOCUMENT_REFERENCE(
 	reference_id                   NUMBER(19,0) NOT NULL primary key,
-	category_id                    VARCHAR2(30) NOT NULL,
-	description_id                 VARCHAR2(100),
+	category_id                    NUMBER(19,0) NOT NULL,
+	description_id                 NUMBER(19,0),
 	document_table_name            VARCHAR2(100),
 	ref_id_column_name             VARCHAR2(100),
 	ref_num_column_name            VARCHAR2(100),

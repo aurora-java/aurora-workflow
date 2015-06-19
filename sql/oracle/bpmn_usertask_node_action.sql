@@ -1,6 +1,6 @@
 --create table
 CREATE TABLE BPMN_USERTASK_NODE_ACTION(
-	record_id                      NUMBER(19,0) NOT NULL primary key,
+	action_id                      NUMBER(19,0) NOT NULL primary key,
 	usertask_id                    NUMBER(19,0),
 	action_code                    VARCHAR2(20),
 	action_code_custom             VARCHAR2(45),
@@ -18,7 +18,7 @@ create sequence bpmn_usertask_node_action_s;
 --add table comment
 comment on table  bpmn_usertask_node_action is '工作流节点动作定义表';
 --add column comments
-comment on column bpmn_usertask_node_action.record_id is '工作流节点动作ID';
+comment on column bpmn_usertask_node_action.action_id is '工作流节点动作ID';
 comment on column bpmn_usertask_node_action.usertask_id is '工作流节点ID';
 comment on column bpmn_usertask_node_action.action_code is '工作流动作代码(标准or CUSTOM)';
 comment on column bpmn_usertask_node_action.action_code_custom is '当action_code 为 CUSTOM时的自定义值';

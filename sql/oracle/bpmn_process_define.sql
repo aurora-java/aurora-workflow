@@ -7,8 +7,8 @@ CREATE TABLE BPMN_PROCESS_DEFINE(
 	current_version_flag           VARCHAR2(1),
 	defines                        CLOB,
 	name                           VARCHAR2(100),
-	approve_status                 VARCHAR2(45) NOT NULL,
-	valid_flag                     VARCHAR2(1) NOT NULL,
+	approve_flag                   VARCHAR2(45),
+	valid_flag                     VARCHAR2(1),
 	category_id                    NUMBER(19,0) NOT NULL,
 	created_by                     NUMBER(19,0),
 	creation_date                  DATE,
@@ -30,7 +30,7 @@ comment on column bpmn_process_define.description is '说明';
 comment on column bpmn_process_define.current_version_flag is '是否当前版本';
 comment on column bpmn_process_define.defines is 'XML形式存储的BPMN配置';
 comment on column bpmn_process_define.name is '流程名称';
-comment on column bpmn_process_define.approve_status is '审批标记,未审批:NONE,审批中:APPROVING,审批通过:APPROVED';
-comment on column bpmn_process_define.valid_flag is '有效标记.Y,N';
+comment on column bpmn_process_define.approve_flag is '审批标记,未审批:空或0,已审批:2';
+comment on column bpmn_process_define.valid_flag is '有效标记.Y,N空';
 comment on column bpmn_process_define.category_id is '类别ID';
 
