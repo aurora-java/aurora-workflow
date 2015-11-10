@@ -88,11 +88,11 @@ public class ExecutorContext {
 
 	public BPMScriptEngine createScriptEngine(CompositeMap context) {
 		ScriptShareObject sso = (ScriptShareObject) context
-				.get(AuroraScriptEngine.KEY_SSO);
+				.get(BPMScriptEngine.KEY_SSO);
 		if (sso == null) {
 			sso = new ScriptShareObject();
 			sso.put(getObjectRegistry());
-			context.put(AuroraScriptEngine.KEY_SSO, sso);
+			context.put(BPMScriptEngine.KEY_SSO, sso);
 
 		}
 		BPMScriptEngine engine = new BPMScriptEngine(context);

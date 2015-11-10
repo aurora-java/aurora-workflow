@@ -8,28 +8,28 @@ import aurora.sqlje.exception.*;
 import java.util.Map;
 import aurora.sqlje.core.*;
 
-public class ArriveProc implements aurora.sqlje.core.ISqlCallEnabled {
+public class ArriveProc implements ISqlCallEnabled {
 	public void arrive(Long instance_id, Long path_id, Long node_id)
 			throws Exception {
 	}
 
-	protected aurora.sqlje.core.IInstanceManager _$sqlje_instanceManager = null;
-	protected aurora.sqlje.core.ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected IInstanceManager _$sqlje_instanceManager = null;
 	protected SqlFlag $sql = new SqlFlag(this);
 
-	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
+	public ISqlCallStack getSqlCallStack() {
 		return _$sqlje_sqlCallStack;
 	}
 
-	public aurora.sqlje.core.IInstanceManager getInstanceManager() {
+	public void _$setSqlCallStack(ISqlCallStack args0) {
+		_$sqlje_sqlCallStack = args0;
+	}
+
+	public IInstanceManager getInstanceManager() {
 		return _$sqlje_instanceManager;
 	}
 
-	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
+	public void _$setInstanceManager(IInstanceManager args0) {
 		_$sqlje_instanceManager = args0;
-	}
-
-	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
-		_$sqlje_sqlCallStack = args0;
 	}
 }

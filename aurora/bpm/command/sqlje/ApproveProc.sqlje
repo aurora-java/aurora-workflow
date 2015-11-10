@@ -66,9 +66,9 @@ public class ApproveProc {
 		if(in(bun.approval_type,0L,1L,2L,4L,7L)) {
 			String ret = approveByApproverCount(instance_id, usertask_id, bun);
 			if(!WAIT.equals(ret)) {
-				#{delete from bpmn_instance_node_recipient r
-					where r.instance_id=${instance_id} 
-					  and r.usertask_id=${usertask_id}};
+				#{delete from bpmn_instance_node_recipient
+					where instance_id=${instance_id} 
+					  and usertask_id=${usertask_id}};
 			}
 			return ret;
 		}

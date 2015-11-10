@@ -3,6 +3,7 @@ package aurora.bpm.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.SequenceFlow;
@@ -21,9 +22,10 @@ public class InclusiveGatewayExecutor extends AbstractCommandExecutor {
 	public void executeWithSqlCallStack(ISqlCallStack callStack, Command cmd)
 			throws Exception {
 		String node_id = cmd.getOptions().getString(NODE_ID);
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
-		InclusiveGateway ig = findFlowElementById(process, node_id,
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		InclusiveGateway ig = findFlowElementById(container, node_id,
 				InclusiveGateway.class);
 		BPMScriptEngine engine = prepareScriptEngine(callStack, cmd);
 		engine.registry("process", process);

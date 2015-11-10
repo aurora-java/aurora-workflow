@@ -9,7 +9,8 @@ import aurora.sqlje.exception.*;
 import java.util.Map;
 import aurora.sqlje.core.*;
 
-public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled {
+public class DefaultRecipientRules
+		implements ISqlCallEnabled {
 	public BpmnDocumentReference getDocumentReference(Long instance_id)
 			throws Exception {
 		String _$sqlje_sql_gen27 = "select *\n\t\t\t  from bpmn_document_reference\n\t\t\t  where category_id = (select d.category_id\n\t\t\t                         from bpmn_process_define d, bpmn_process_instance i\n\t\t\t                        where d.process_code = i.process_code\n\t\t\t                          and d.process_version = i.process_version\n\t\t\t                          and i.instance_id = ?)\n\t\t";
@@ -22,8 +23,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen0 = _$sqlje_ps_gen26.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen0);
 		getSqlCallStack().push(_$sqlje_ps_gen26);
-		BpmnDocumentReference doc_ref = DataTransfer.transfer1(
-				BpmnDocumentReference.class, _$sqlje_rs_gen0);
+		BpmnDocumentReference doc_ref = DataTransfer
+				.transfer1(BpmnDocumentReference.class, _$sqlje_rs_gen0);
 		return doc_ref;
 	}
 
@@ -47,7 +48,7 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 	}
 
 	/** 
- */
+	*/
 	public Long getInstanceCompany(Long instance_id) throws Exception {
 		try {
 			BpmnDocumentReference doc_ref = getDocumentReference(instance_id);
@@ -166,7 +167,7 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 			Long seq_number, Long approver_id, String posted_flag,
 			String disabled_flag, String note, Long rule_record_id,
 			Long rule_detail_id, Long user_id, String added_order)
-			throws Exception {
+					throws Exception {
 		BpmnInstanceNodeHierarchy hir = new BpmnInstanceNodeHierarchy();
 		hir.instance_id = instance_id;
 		hir.usertask_id = usertask_id;
@@ -183,8 +184,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 	}
 
 	public Long insertBpmInstanceNodeHirc(Long seq_number, Long approver_id,
-			String note, Long rule_record_id, Long rule_detail_id,
-			Long user_id, String added_order) throws Exception {
+			String note, Long rule_record_id, Long rule_detail_id, Long user_id,
+			String added_order) throws Exception {
 		String _$sqlje_sql_gen43 = "select * from bpmn_instance_node_rule where rule_record_id = ?";
 		PreparedStatement _$sqlje_ps_gen42 = getSqlCallStack()
 				.getCurrentConnection().prepareStatement(_$sqlje_sql_gen43);
@@ -195,8 +196,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen6 = _$sqlje_ps_gen42.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen6);
 		getSqlCallStack().push(_$sqlje_ps_gen42);
-		BpmnInstanceNodeRule rule_record = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen6);
+		BpmnInstanceNodeRule rule_record = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen6);
 		return insertBpmInstanceNodeHirc(rule_record.instance_id,
 				rule_record.usertask_id, seq_number, approver_id, "N", "N",
 				note, rule_record_id, rule_detail_id, user_id, added_order);
@@ -209,7 +210,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 	}
 
 	public void getEmployeeGrandmanager(String param1, String param2,
-			String param3, String param4, Long rule_record_id) throws Exception {
+			String param3, String param4, Long rule_record_id)
+					throws Exception {
 		String _$sqlje_sql_gen45 = "select * from bpmn_instance_node_rule where rule_record_id=?";
 		PreparedStatement _$sqlje_ps_gen44 = getSqlCallStack()
 				.getCurrentConnection().prepareStatement(_$sqlje_sql_gen45);
@@ -220,8 +222,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen7 = _$sqlje_ps_gen44.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen7);
 		getSqlCallStack().push(_$sqlje_ps_gen44);
-		BpmnInstanceNodeRule node_rule = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen7);
+		BpmnInstanceNodeRule node_rule = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen7);
 		Long company_id = getInstanceCompany(node_rule.instance_id);
 		List<Long> positions = getDocumentPosition(node_rule.instance_id);
 		if (positions.size() == 0)
@@ -241,8 +243,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 					_$sqlje_rs_gen8, Long.class)) {
 				String _$sqlje_sql_gen49 = "select parent_position_id\n\t\t\t\t\t\tfrom wfl_position_v\n\t\t\t\t\t\twhere position_id = ?";
 				PreparedStatement _$sqlje_ps_gen48 = getSqlCallStack()
-						.getCurrentConnection().prepareStatement(
-								_$sqlje_sql_gen49);
+						.getCurrentConnection()
+						.prepareStatement(_$sqlje_sql_gen49);
 				_$sqlje_ps_gen48.setLong(1, parent_position);
 				$sql.clear();
 				_$sqlje_ps_gen48.execute();
@@ -254,8 +256,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 						_$sqlje_rs_gen9, Long.class)) {
 					String _$sqlje_sql_gen51 = "SELECT DISTINCT u.user_id\n                            FROM wfl_employee_assigns_v a, wfl_users_v u\n                           WHERE a.position_id = ?\n                             AND a.employee_id = u.employee_id\n                             AND a.company_id = ?";
 					PreparedStatement _$sqlje_ps_gen50 = getSqlCallStack()
-							.getCurrentConnection().prepareStatement(
-									_$sqlje_sql_gen51);
+							.getCurrentConnection()
+							.prepareStatement(_$sqlje_sql_gen51);
 					_$sqlje_ps_gen50.setLong(1, grandparent_position);
 					_$sqlje_ps_gen50.setLong(2, company_id);
 					$sql.clear();
@@ -268,7 +270,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 					for (Long approver_id : new ResultSetIterator<Long>(
 							_$sqlje_rs_gen10, Long.class)) {
 						insertBpmInstanceNodeHirc(node_rule.recipient_sequence,
-								approver_id, "", rule_record_id, null, 1L, null);
+								approver_id, "", rule_record_id, null, 1L,
+								null);
 					}
 				}
 			}
@@ -287,8 +290,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen11 = _$sqlje_ps_gen52.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen11);
 		getSqlCallStack().push(_$sqlje_ps_gen52);
-		BpmnInstanceNodeRule node_rule = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen11);
+		BpmnInstanceNodeRule node_rule = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen11);
 		List<Long> emps = getDocumentEmployee(node_rule.instance_id);
 		if (emps.size() == 0)
 			return;
@@ -315,7 +318,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 	 * 取得申请者部门主管
 	 */
 	public void getEmployeeUnitManager(String param1, String param2,
-			String param3, String param4, Long rule_record_id) throws Exception {
+			String param3, String param4, Long rule_record_id)
+					throws Exception {
 		String _$sqlje_sql_gen57 = "select * from bpmn_instance_node_rule where rule_record_id=?";
 		PreparedStatement _$sqlje_ps_gen56 = getSqlCallStack()
 				.getCurrentConnection().prepareStatement(_$sqlje_sql_gen57);
@@ -326,8 +330,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen13 = _$sqlje_ps_gen56.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen13);
 		getSqlCallStack().push(_$sqlje_ps_gen56);
-		BpmnInstanceNodeRule node_rule = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen13);
+		BpmnInstanceNodeRule node_rule = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen13);
 		Long company_id = getInstanceCompany(node_rule.instance_id);
 		List<Long> positions = getDocumentPosition(node_rule.instance_id);
 		if (positions.size() == 0)
@@ -347,8 +351,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 					_$sqlje_rs_gen14, Long.class)) {
 				String _$sqlje_sql_gen61 = "SELECT DISTINCT u.user_id\n\t                    FROM wfl_employee_assigns_v a, wfl_users_v u\n\t                   WHERE a.position_id = ?\n\t                     AND a.employee_id = u.employee_id\n\t                     AND a.company_id = ?";
 				PreparedStatement _$sqlje_ps_gen60 = getSqlCallStack()
-						.getCurrentConnection().prepareStatement(
-								_$sqlje_sql_gen61);
+						.getCurrentConnection()
+						.prepareStatement(_$sqlje_sql_gen61);
 				_$sqlje_ps_gen60.setLong(1, chief_position_id);
 				_$sqlje_ps_gen60.setLong(2, company_id);
 				$sql.clear();
@@ -381,10 +385,11 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen16 = _$sqlje_ps_gen62.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen16);
 		getSqlCallStack().push(_$sqlje_ps_gen62);
-		BpmnInstanceNodeRule node_rule = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen16);
+		BpmnInstanceNodeRule node_rule = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen16);
 		Long company_id = getInstanceCompany(node_rule.instance_id);
-		List<Long> document_positions = getDocumentPosition(node_rule.instance_id);
+		List<Long> document_positions = getDocumentPosition(
+				node_rule.instance_id);
 		if (document_positions.size() == 0) {
 			return;
 		}
@@ -403,8 +408,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 					_$sqlje_rs_gen17, Long.class)) {
 				String _$sqlje_sql_gen67 = "SELECT DISTINCT u.user_id\n                              FROM wfl_employee_assigns_v a, wfl_users_v u\n                             WHERE a.position_id = ?\n                               AND a.employee_id = u.employee_id\n                               AND a.company_id = ?";
 				PreparedStatement _$sqlje_ps_gen66 = getSqlCallStack()
-						.getCurrentConnection().prepareStatement(
-								_$sqlje_sql_gen67);
+						.getCurrentConnection()
+						.prepareStatement(_$sqlje_sql_gen67);
 				_$sqlje_ps_gen66.setLong(1, parent_position);
 				_$sqlje_ps_gen66.setLong(2, company_id);
 				$sql.clear();
@@ -423,7 +428,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 	}
 
 	public void getEmployeeCompanyManager(String param1, String param2,
-			String param3, String param4, Long rule_record_id) throws Exception {
+			String param3, String param4, Long rule_record_id)
+					throws Exception {
 		String _$sqlje_sql_gen69 = "select * from bpmn_instance_node_rule where rule_record_id=?";
 		PreparedStatement _$sqlje_ps_gen68 = getSqlCallStack()
 				.getCurrentConnection().prepareStatement(_$sqlje_sql_gen69);
@@ -434,8 +440,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen19 = _$sqlje_ps_gen68.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen19);
 		getSqlCallStack().push(_$sqlje_ps_gen68);
-		BpmnInstanceNodeRule node_rule = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen19);
+		BpmnInstanceNodeRule node_rule = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen19);
 		Long company_id = getInstanceCompany(node_rule.instance_id);
 		String _$sqlje_sql_gen71 = "SELECT chief_position_id\n                               FROM wfl_companies_v\n                              WHERE company_id = ?";
 		PreparedStatement _$sqlje_ps_gen70 = getSqlCallStack()
@@ -447,8 +453,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen20 = _$sqlje_ps_gen70.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen20);
 		getSqlCallStack().push(_$sqlje_ps_gen70);
-		for (Long chief_position : new ResultSetIterator<Long>(
-				_$sqlje_rs_gen20, Long.class)) {
+		for (Long chief_position : new ResultSetIterator<Long>(_$sqlje_rs_gen20,
+				Long.class)) {
 			String _$sqlje_sql_gen73 = "SELECT DISTINCT u.user_id\n                            FROM wfl_employee_assigns_v a, wfl_users_v u\n                           WHERE a.position_id = ?\n                             AND a.employee_id = u.employee_id\n                             AND a.company_id = ?";
 			PreparedStatement _$sqlje_ps_gen72 = getSqlCallStack()
 					.getCurrentConnection().prepareStatement(_$sqlje_sql_gen73);
@@ -472,7 +478,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 	 * 指定人员
 	 */
 	public void getAppointedEmployee(String param1, String param2,
-			String param3, String param4, Long rule_record_id) throws Exception {
+			String param3, String param4, Long rule_record_id)
+					throws Exception {
 		String _$sqlje_sql_gen75 = "select * from bpmn_instance_node_rule where rule_record_id=?";
 		PreparedStatement _$sqlje_ps_gen74 = getSqlCallStack()
 				.getCurrentConnection().prepareStatement(_$sqlje_sql_gen75);
@@ -483,8 +490,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen22 = _$sqlje_ps_gen74.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen22);
 		getSqlCallStack().push(_$sqlje_ps_gen74);
-		BpmnInstanceNodeRule node_rule = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen22);
+		BpmnInstanceNodeRule node_rule = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen22);
 		Long emp_id = Long.parseLong(param1);
 		String _$sqlje_sql_gen77 = "select user_id from wfl_users_v\n\t\t\t\t\t\t\twhere employee_id=?";
 		PreparedStatement _$sqlje_ps_gen76 = getSqlCallStack()
@@ -498,8 +505,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		getSqlCallStack().push(_$sqlje_ps_gen76);
 		for (Long approver_id : new ResultSetIterator<Long>(_$sqlje_rs_gen23,
 				Long.class)) {
-			insertBpmInstanceNodeHirc(node_rule.recipient_sequence,
-					approver_id, "", rule_record_id, null, 1L, null);
+			insertBpmInstanceNodeHirc(node_rule.recipient_sequence, approver_id,
+					"", rule_record_id, null, 1L, null);
 		}
 	}
 
@@ -507,7 +514,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 	 * 指定岗位
 	 */
 	public void getAppointedPosition(String param1, String param2,
-			String param3, String param4, Long rule_record_id) throws Exception {
+			String param3, String param4, Long rule_record_id)
+					throws Exception {
 		String _$sqlje_sql_gen79 = "select * from bpmn_instance_node_rule where rule_record_id=?";
 		PreparedStatement _$sqlje_ps_gen78 = getSqlCallStack()
 				.getCurrentConnection().prepareStatement(_$sqlje_sql_gen79);
@@ -518,8 +526,8 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		ResultSet _$sqlje_rs_gen24 = _$sqlje_ps_gen78.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen24);
 		getSqlCallStack().push(_$sqlje_ps_gen78);
-		BpmnInstanceNodeRule node_rule = DataTransfer.transfer1(
-				BpmnInstanceNodeRule.class, _$sqlje_rs_gen24);
+		BpmnInstanceNodeRule node_rule = DataTransfer
+				.transfer1(BpmnInstanceNodeRule.class, _$sqlje_rs_gen24);
 		Long pos_id = Long.parseLong(param1);
 		String _$sqlje_sql_gen81 = "select user_id \n\t\t\t\t\t\t from wfl_employee_assigns_v a,wfl_users_v u\n\t\t\t\t\t\twhere a.position_id=?\n\t\t\t\t\t\t  and a.employee_id=u.employee_id";
 		PreparedStatement _$sqlje_ps_gen80 = getSqlCallStack()
@@ -533,28 +541,28 @@ public class DefaultRecipientRules implements aurora.sqlje.core.ISqlCallEnabled 
 		getSqlCallStack().push(_$sqlje_ps_gen80);
 		for (Long approver_id : new ResultSetIterator<Long>(_$sqlje_rs_gen25,
 				Long.class)) {
-			insertBpmInstanceNodeHirc(node_rule.recipient_sequence,
-					approver_id, "", rule_record_id, null, 1L, null);
+			insertBpmInstanceNodeHirc(node_rule.recipient_sequence, approver_id,
+					"", rule_record_id, null, 1L, null);
 		}
 	}
 
-	protected aurora.sqlje.core.IInstanceManager _$sqlje_instanceManager = null;
-	protected aurora.sqlje.core.ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected IInstanceManager _$sqlje_instanceManager = null;
 	protected SqlFlag $sql = new SqlFlag(this);
 
-	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
+	public ISqlCallStack getSqlCallStack() {
 		return _$sqlje_sqlCallStack;
 	}
 
-	public aurora.sqlje.core.IInstanceManager getInstanceManager() {
+	public void _$setSqlCallStack(ISqlCallStack args0) {
+		_$sqlje_sqlCallStack = args0;
+	}
+
+	public IInstanceManager getInstanceManager() {
 		return _$sqlje_instanceManager;
 	}
 
-	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
+	public void _$setInstanceManager(IInstanceManager args0) {
 		_$sqlje_instanceManager = args0;
-	}
-
-	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
-		_$sqlje_sqlCallStack = args0;
 	}
 }

@@ -22,15 +22,16 @@ public class CreateInstanceCmdExecutor extends AbstractCommandExecutor {
 		CompositeMap options = cmd.getOptions();
 
 		String version = options.getString(PROCESS_VERSION);
-		org.eclipse.bpmn2.Process process = (org.eclipse.bpmn2.Process) getProcess(loadDefinitions(
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(
 				cmd, callStack));
 		Long parent_id = options.getLong("parent_id");
 		Long instance_param = options.getLong("instance_param");
 		InstanceProc ci = createProc(InstanceProc.class, callStack);
 		Long instance_id = ci.create(options.getString(PROCESS_CODE), version,
-				parent_id, instance_param);
+				parent_id, process.getId(), instance_param);
 		cmd.getOptions().put(INSTANCE_ID, instance_id);// set new instance_id
 														// back
+		cmd.getOptions().put(SCOPE_ID, process.getId());
 		System.out.println("instance created ,id:" + instance_id);
 
 		ProcessLogProc logger = getExecutorContext().getLogger();

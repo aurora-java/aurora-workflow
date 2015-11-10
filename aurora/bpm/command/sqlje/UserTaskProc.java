@@ -11,7 +11,7 @@ import aurora.sqlje.exception.*;
 import java.util.Map;
 import aurora.sqlje.core.*;
 
-public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
+public class UserTaskProc implements ISqlCallEnabled {
 	public BpmnUsertaskNode query(String code, String version, String node_id)
 			throws Exception {
 		try {
@@ -27,8 +27,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 			ResultSet _$sqlje_rs_gen0 = _$sqlje_ps_gen24.getResultSet();
 			getSqlCallStack().push(_$sqlje_rs_gen0);
 			getSqlCallStack().push(_$sqlje_ps_gen24);
-			BpmnUsertaskNode ut = DataTransfer.transfer1(
-					BpmnUsertaskNode.class, _$sqlje_rs_gen0);
+			BpmnUsertaskNode ut = DataTransfer.transfer1(BpmnUsertaskNode.class,
+					_$sqlje_rs_gen0);
 			return ut;
 		} catch (NoDataFoundException e) {
 		}
@@ -64,8 +64,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 		ResultSet _$sqlje_rs_gen2 = _$sqlje_ps_gen28.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen2);
 		getSqlCallStack().push(_$sqlje_ps_gen28);
-		BpmnRecipientRules rule = DataTransfer.transfer1(
-				BpmnRecipientRules.class, _$sqlje_rs_gen2);
+		BpmnRecipientRules rule = DataTransfer
+				.transfer1(BpmnRecipientRules.class, _$sqlje_rs_gen2);
 		return rule;
 	}
 
@@ -97,7 +97,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 					node_recipient.parameter_1_value,
 					node_recipient.parameter_2_value,
 					node_recipient.parameter_3_value,
-					node_recipient.parameter_4_value, "RECIPIENT_RULE", user_id);
+					node_recipient.parameter_4_value, "RECIPIENT_RULE",
+					user_id);
 		}
 	}
 
@@ -149,8 +150,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 				else {
 					String _$sqlje_sql_gen35 = "select procedure_name from bpmn_recipient_rules where rule_code = ?";
 					PreparedStatement _$sqlje_ps_gen34 = getSqlCallStack()
-							.getCurrentConnection().prepareStatement(
-									_$sqlje_sql_gen35);
+							.getCurrentConnection()
+							.prepareStatement(_$sqlje_sql_gen35);
 					_$sqlje_ps_gen34.setObject(1, recipient_rule.rule_code);
 					$sql.clear();
 					_$sqlje_ps_gen34.execute();
@@ -164,8 +165,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 				int idx = proc_name.lastIndexOf('.');
 				String proc_class = proc_name.substring(0, idx);
 				String proc_method = proc_name.substring(idx + 1);
-				ISqlCallEnabled proc = getInstanceManager().createInstance(
-						proc_class, this);
+				ISqlCallEnabled proc = getInstanceManager()
+						.createInstance(proc_class, this);
 				java.lang.reflect.Method m = proc.getClass().getMethod(
 						proc_method, String.class, String.class, String.class,
 						String.class, Long.class);
@@ -192,12 +193,14 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 		getSqlCallStack().push(_$sqlje_ps_gen36);
 		for (BpmnInstanceNodeHierarchy repeat_rcpt : new ResultSetIterator<BpmnInstanceNodeHierarchy>(
 				_$sqlje_rs_gen6, BpmnInstanceNodeHierarchy.class)) {
-			String _$sqlje_sql_gen39 = "update bpmn_instance_node_hierarchy\n\t\t         set disabled_flag    = 'Y',\n\t\t             note             = 'Repeated Recipient Rule',\n\t\t             last_update_date = CURRENT_TIMESTAMP,\n\t\t             last_updated_by  = ?\n\t\t       where instance_id = ?\n\t\t         and usertask_id = ?\n\t\t         and approver_id = repeat_rcpt.approver_id\n\t\t         and hierarchy_record_id > repeat_rcpt.hierarchy_record_id";
+			String _$sqlje_sql_gen39 = "update bpmn_instance_node_hierarchy\n\t\t         set disabled_flag    = 'Y',\n\t\t             note             = 'Repeated Recipient Rule',\n\t\t             last_update_date = CURRENT_TIMESTAMP,\n\t\t             last_updated_by  = ?\n\t\t       where instance_id = ?\n\t\t         and usertask_id = ?\n\t\t         and approver_id = ?\n\t\t         and hierarchy_record_id > ?";
 			PreparedStatement _$sqlje_ps_gen38 = getSqlCallStack()
 					.getCurrentConnection().prepareStatement(_$sqlje_sql_gen39);
 			_$sqlje_ps_gen38.setLong(1, user_id);
 			_$sqlje_ps_gen38.setLong(2, instance_id);
 			_$sqlje_ps_gen38.setLong(3, usertask_id);
+			_$sqlje_ps_gen38.setObject(4, repeat_rcpt.approver_id);
+			_$sqlje_ps_gen38.setObject(5, repeat_rcpt.hierarchy_record_id);
 			$sql.clear();
 			_$sqlje_ps_gen38.execute();
 			$sql.UPDATECOUNT = _$sqlje_ps_gen38.getUpdateCount();
@@ -265,8 +268,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 			ResultSet _$sqlje_rs_gen11 = _$sqlje_ps_gen46.getResultSet();
 			getSqlCallStack().push(_$sqlje_rs_gen11);
 			getSqlCallStack().push(_$sqlje_ps_gen46);
-			for (Map approver_seq : new ResultSetIterator<Map>(
-					_$sqlje_rs_gen11, Map.class)) {
+			for (Map approver_seq : new ResultSetIterator<Map>(_$sqlje_rs_gen11,
+					Map.class)) {
 				Long rule_record_id = ResultSetUtil.get(approver_seq,
 						"rule_record_id", Long.class);
 				Long seq_number = ResultSetUtil.get(approver_seq, "seq_number",
@@ -274,8 +277,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 				Long root_hierarchy_id = root_approver;
 				String _$sqlje_sql_gen49 = "select count(*)\n\t\t\t\t\tfrom bpmn_instance_node_hierarchy a,bpmn_instance_node_recipient b\n\t\t\t\t\twhere a.hierarchy_record_id=b.hierarchy_record_id\n\t\t\t\t\tand a.instance_id = ?\n\t\t\t\t\tand a.usertask_id = ?\n\t\t\t\t\tand a.rule_record_id = ?\n\t\t\t\t\tand a.hierarchy_record_id in(\n\t\t\t\t\t\t\tselect a.hierarchy_record_id\n\t\t\t\t\t\t\tfrom bpmn_instance_node_hierarchy a\n\t\t\t\t\t\t\twhere a.instance_id=?\n\t\t\t\t\t\t\tand a.usertask_id=?\n\t\t\t\t\t\t\tand coalesce(posted_flag,'N')='N'\n\t\t\t\t\t\t\tand coalesce(disabled_flag,'N')='N')\n\t\t\t\t\tand a.seq_number<?";
 				PreparedStatement _$sqlje_ps_gen48 = getSqlCallStack()
-						.getCurrentConnection().prepareStatement(
-								_$sqlje_sql_gen49);
+						.getCurrentConnection()
+						.prepareStatement(_$sqlje_sql_gen49);
 				_$sqlje_ps_gen48.setLong(1, instance_id);
 				_$sqlje_ps_gen48.setLong(2, usertask_id);
 				_$sqlje_ps_gen48.setLong(3, rule_record_id);
@@ -294,8 +297,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 					_$sqlje_sql_gen51 = $sql
 							._$prepareLimitSql(_$sqlje_sql_gen51);
 					PreparedStatement _$sqlje_ps_gen50 = getSqlCallStack()
-							.getCurrentConnection().prepareStatement(
-									_$sqlje_sql_gen51);
+							.getCurrentConnection()
+							.prepareStatement(_$sqlje_sql_gen51);
 					_$sqlje_ps_gen50.setLong(1, instance_id);
 					_$sqlje_ps_gen50.setLong(2, current_node_id);
 					_$sqlje_ps_gen50.setLong(3, seq_number);
@@ -311,15 +314,15 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 							.getResultSet();
 					getSqlCallStack().push(_$sqlje_rs_gen13);
 					getSqlCallStack().push(_$sqlje_ps_gen50);
-					CompositeMap un_post_user = DataTransfer.transfer1(
-							CompositeMap.class, _$sqlje_rs_gen13);
+					CompositeMap un_post_user = DataTransfer
+							.transfer1(CompositeMap.class, _$sqlje_rs_gen13);
 					Long approver_id = un_post_user.getLong("approver_id");
 					Long hierarchy_record_id = un_post_user
 							.getLong("hierarchy_record_id");
 					String _$sqlje_sql_gen53 = "update bpmn_instance_node_hierarchy\n\t\t\t\t\t\tset posted_flag='Y',\n\t\t\t\t\t\tlast_update_date=current_timestamp,\n\t\t\t\t\t\tlast_updated_by=1\n\t\t\t\t\t\twhere hierarchy_record_id=?";
 					PreparedStatement _$sqlje_ps_gen52 = getSqlCallStack()
-							.getCurrentConnection().prepareStatement(
-									_$sqlje_sql_gen53);
+							.getCurrentConnection()
+							.prepareStatement(_$sqlje_sql_gen53);
 					_$sqlje_ps_gen52.setLong(1, hierarchy_record_id);
 					$sql.clear();
 					_$sqlje_ps_gen52.execute();
@@ -387,8 +390,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 				try {
 					String _$sqlje_sql_gen59 = "select * from bpmn_instance_node_recipient \n\t\t\t\t\twhere instance_id = ? \n\t\t\t\t\tand record_id = ?";
 					PreparedStatement _$sqlje_ps_gen58 = getSqlCallStack()
-							.getCurrentConnection().prepareStatement(
-									_$sqlje_sql_gen59);
+							.getCurrentConnection()
+							.prepareStatement(_$sqlje_sql_gen59);
 					_$sqlje_ps_gen58.setLong(1, instance_id);
 					_$sqlje_ps_gen58.setLong(2, record_id);
 					$sql.clear();
@@ -473,9 +476,9 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 		Long rule_detail_id = c_rcpt.getLong("rule_detail_id");
 		DefaultRecipientRules def_rcpt_rule_proc = getInstanceManager()
 				.createInstance(DefaultRecipientRules.class, this);
-		Long hirc_id = def_rcpt_rule_proc.insertBpmInstanceNodeHirc(
-				instance_id, usertask_id, seq_number, user_id, "Y", "N", "由"
-						+ user_id_from + "转交", rule_record_id, rule_detail_id,
+		Long hirc_id = def_rcpt_rule_proc.insertBpmInstanceNodeHirc(instance_id,
+				usertask_id, seq_number, user_id, "Y", "N",
+				"由" + user_id_from + "转交", rule_record_id, rule_detail_id,
 				user_id_from, null);
 		BpmnInstanceNodeRecipient binr = new BpmnInstanceNodeRecipient();
 		binr.instance_id = instance_id;
@@ -498,8 +501,8 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 		ResultSet _$sqlje_rs_gen21 = _$sqlje_ps_gen66.getResultSet();
 		getSqlCallStack().push(_$sqlje_rs_gen21);
 		getSqlCallStack().push(_$sqlje_ps_gen66);
-		CompositeMap c_approve_record = DataTransfer.transfer1(
-				CompositeMap.class, _$sqlje_rs_gen21);
+		CompositeMap c_approve_record = DataTransfer
+				.transfer1(CompositeMap.class, _$sqlje_rs_gen21);
 		BpmnApproveRecord bar = new BpmnApproveRecord();
 		bar.usertask_id = usertask_id;
 		bar.instance_id = instance_id;
@@ -543,23 +546,23 @@ public class UserTaskProc implements aurora.sqlje.core.ISqlCallEnabled {
 		return o1.equals(o2);
 	}
 
-	protected aurora.sqlje.core.IInstanceManager _$sqlje_instanceManager = null;
-	protected aurora.sqlje.core.ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected IInstanceManager _$sqlje_instanceManager = null;
 	protected SqlFlag $sql = new SqlFlag(this);
 
-	public aurora.sqlje.core.IInstanceManager getInstanceManager() {
-		return _$sqlje_instanceManager;
+	public ISqlCallStack getSqlCallStack() {
+		return _$sqlje_sqlCallStack;
 	}
 
-	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
-		_$sqlje_instanceManager = args0;
-	}
-
-	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
+	public void _$setSqlCallStack(ISqlCallStack args0) {
 		_$sqlje_sqlCallStack = args0;
 	}
 
-	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
-		return _$sqlje_sqlCallStack;
+	public IInstanceManager getInstanceManager() {
+		return _$sqlje_instanceManager;
+	}
+
+	public void _$setInstanceManager(IInstanceManager args0) {
+		_$sqlje_instanceManager = args0;
 	}
 }

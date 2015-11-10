@@ -1,5 +1,6 @@
 package aurora.bpm.command;
 
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.ManualTask;
 
 import aurora.database.service.IDatabaseServiceFactory;
@@ -17,9 +18,10 @@ public class ManualTaskExecutor extends AbstractCommandExecutor {
 			throws Exception {
 		super.executeWithSqlCallStack(callStack, cmd);
 		String node_id = cmd.getOptions().getString(NODE_ID);
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
-		ManualTask mt = findFlowElementById(process, node_id, ManualTask.class);
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		ManualTask mt = findFlowElementById(container, node_id, ManualTask.class);
 		System.out.println("[manual task] has been done!");
 		createOutgoingPath(callStack, mt, cmd);
 	}

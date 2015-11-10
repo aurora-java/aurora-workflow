@@ -1,5 +1,6 @@
 package aurora.bpm.command;
 
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.UserTask;
 
 import aurora.bpm.command.beans.BpmnUsertaskNode;
@@ -21,9 +22,10 @@ public class UserTaskExecutor extends ApproveCmdExecutor {
 		Long instance_id = cmd.getOptions().getLong(INSTANCE_ID);
 		Long user_id = cmd.getOptions().getLong(USER_ID);
 		String node_id = cmd.getOptions().getString(NODE_ID);
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
-		UserTask currentNode = findFlowElementById(process, node_id,
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		UserTask currentNode = findFlowElementById(container, node_id,
 				UserTask.class);
 		String code = cmd.getOptions().getString(PROCESS_CODE);
 		String version = cmd.getOptions().getString(PROCESS_VERSION);

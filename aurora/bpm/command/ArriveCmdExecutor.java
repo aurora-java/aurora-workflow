@@ -1,6 +1,7 @@
 package aurora.bpm.command;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.FlowNode;
 
 import uncertain.composite.CompositeMap;
@@ -19,9 +20,10 @@ public class ArriveCmdExecutor extends AbstractCommandExecutor {
 	public void executeWithSqlCallStack(ISqlCallStack callStack, Command cmd)
 			throws Exception {
 		String node_id = cmd.getOptions().getString(NODE_ID);
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
-		FlowElement fe = findFlowElementById(process, node_id);
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		FlowElement fe = findFlowElementById(container, node_id);
 		if (fe instanceof FlowNode) {
 			String className = fe.getClass().getSimpleName();
 			if (className.endsWith("Impl"))

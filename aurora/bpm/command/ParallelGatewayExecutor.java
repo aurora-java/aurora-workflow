@@ -3,6 +3,7 @@ package aurora.bpm.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.ParallelGateway;
 import org.eclipse.bpmn2.SequenceFlow;
 
@@ -23,9 +24,10 @@ public class ParallelGatewayExecutor extends AbstractCommandExecutor {
 			throws Exception {
 		Long instance_id = cmd.getOptions().getLong(INSTANCE_ID);
 		String node_id = cmd.getOptions().getString(NODE_ID);
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
-		ParallelGateway pg = findFlowElementById(process, node_id,
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		ParallelGateway pg = findFlowElementById(container, node_id,
 				ParallelGateway.class);
 		if (pg == null) {
 			throw new NodeNotFoundException(node_id, cmd.getOptions()

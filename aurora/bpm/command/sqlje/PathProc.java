@@ -10,7 +10,7 @@ import aurora.sqlje.exception.*;
 import java.util.Map;
 import aurora.sqlje.core.*;
 
-public class PathProc implements aurora.sqlje.core.ISqlCallEnabled {
+public class PathProc implements ISqlCallEnabled {
 	public Long create(Long instance_id, String preNode, String currentNode,
 			String node_id) throws Exception {
 		BpmnPathInstance bpi = new BpmnPathInstance();
@@ -30,7 +30,7 @@ public class PathProc implements aurora.sqlje.core.ISqlCallEnabled {
 
 	public void createPathLog(Long instance_id, Long path_id, Long user_id,
 			String prev_node, String current_node, String log_content)
-			throws Exception {
+					throws Exception {
 		BpmnPathLog bpl = new BpmnPathLog();
 		bpl.instance_id = instance_id;
 		bpl.path_id = path_id;
@@ -71,8 +71,8 @@ public class PathProc implements aurora.sqlje.core.ISqlCallEnabled {
 			ResultSet _$sqlje_rs_gen1 = _$sqlje_ps_gen7.getResultSet();
 			getSqlCallStack().push(_$sqlje_rs_gen1);
 			getSqlCallStack().push(_$sqlje_ps_gen7);
-			BpmnProcessToken token = DataTransfer.transfer1(
-					BpmnProcessToken.class, _$sqlje_rs_gen1);
+			BpmnProcessToken token = DataTransfer
+					.transfer1(BpmnProcessToken.class, _$sqlje_rs_gen1);
 			return token;
 		} catch (NoDataFoundException e) {
 		}
@@ -135,23 +135,23 @@ public class PathProc implements aurora.sqlje.core.ISqlCallEnabled {
 		getSqlCallStack().push(_$sqlje_ps_gen13);
 	}
 
-	protected aurora.sqlje.core.IInstanceManager _$sqlje_instanceManager = null;
-	protected aurora.sqlje.core.ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected IInstanceManager _$sqlje_instanceManager = null;
 	protected SqlFlag $sql = new SqlFlag(this);
 
-	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
+	public ISqlCallStack getSqlCallStack() {
 		return _$sqlje_sqlCallStack;
 	}
 
-	public aurora.sqlje.core.IInstanceManager getInstanceManager() {
+	public void _$setSqlCallStack(ISqlCallStack args0) {
+		_$sqlje_sqlCallStack = args0;
+	}
+
+	public IInstanceManager getInstanceManager() {
 		return _$sqlje_instanceManager;
 	}
 
-	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
+	public void _$setInstanceManager(IInstanceManager args0) {
 		_$sqlje_instanceManager = args0;
-	}
-
-	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
-		_$sqlje_sqlCallStack = args0;
 	}
 }

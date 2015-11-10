@@ -1,5 +1,6 @@
 package aurora.bpm.command;
 
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.SequenceFlow;
 
 import uncertain.composite.CompositeMap;
@@ -28,9 +29,10 @@ public class ProceedCmdExecutor extends AbstractCommandExecutor {
 		BpmnPathInstance bpi = cp.query(path_id);
 		
 		
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
-		SequenceFlow sf = findFlowElementById(process, bpi.node_id,
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		SequenceFlow sf = findFlowElementById(container, bpi.node_id,
 				SequenceFlow.class);
 
 		//cp.close(instance_id, path_id); path will close when the target node accept it.

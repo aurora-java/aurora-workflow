@@ -128,8 +128,8 @@ public class UserTaskProc {
 		             last_updated_by  = ${user_id}
 		       where instance_id = ${instance_id}
 		         and usertask_id = ${usertask_id}
-		         and approver_id = repeat_rcpt.approver_id
-		         and hierarchy_record_id > repeat_rcpt.hierarchy_record_id};
+		         and approver_id = ${repeat_rcpt.approver_id}
+		         and hierarchy_record_id > ${repeat_rcpt.hierarchy_record_id}};
 		}
 	}
 

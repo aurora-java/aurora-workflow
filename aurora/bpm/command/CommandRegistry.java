@@ -9,6 +9,7 @@ import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.ParallelGateway;
 import org.eclipse.bpmn2.StartEvent;
+import org.eclipse.bpmn2.SubProcess;
 
 import uncertain.ocm.IObjectCreator;
 import aurora.bpm.engine.ExecutorContext;
@@ -80,6 +81,7 @@ public class CommandRegistry {
 			bind(InclusiveGateway.class, InclusiveGatewayExecutor.class);
 			bind(ExclusiveGateway.class, ExclusiveGatewayExecutor.class);
 			bind(EndEvent.class, EndEventExecutor.class);
+			bind(SubProcess.class, SubProcessExecutor.class);
 			System.out.println("builtin command registry loaded.");
 		} catch (Exception e) {
 			e.printStackTrace();

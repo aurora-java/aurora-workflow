@@ -1,6 +1,7 @@
 package aurora.bpm.command;
 
 import org.eclipse.bpmn2.ComplexGateway;
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.FormalExpression;
 
 import aurora.bpm.command.sqlje.GatewayProc;
@@ -20,7 +21,7 @@ public class ComplexGatewayExecutor extends AbstractCommandExecutor {
 		super.executeWithSqlCallStack(callStack, cmd);
 		Long instance_id = cmd.getOptions().getLong(INSTANCE_ID);
 		String node_id = cmd.getOptions().getString(NODE_ID);
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
 
 		GatewayProc gw = createProc(GatewayProc.class, callStack);
@@ -30,7 +31,8 @@ public class ComplexGatewayExecutor extends AbstractCommandExecutor {
 					+ " is not waiting for start.");
 			return;
 		}
-		ComplexGateway cg = findFlowElementById(process, node_id,
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		ComplexGateway cg = findFlowElementById(container, node_id,
 				ComplexGateway.class);
 		BPMScriptEngine engine = prepareScriptEngine(callStack, cmd);
 		engine.registry("process", process);

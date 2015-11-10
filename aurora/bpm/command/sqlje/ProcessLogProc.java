@@ -9,7 +9,7 @@ import aurora.sqlje.exception.*;
 import java.util.Map;
 import aurora.sqlje.core.*;
 
-public class ProcessLogProc implements aurora.sqlje.core.ISqlCallEnabled {
+public class ProcessLogProc implements ISqlCallEnabled {
 	public synchronized void log(Long instance_id, Long user_id,
 			String event_type, String log_content) throws Exception {
 		ProcessLog data = new ProcessLog();
@@ -53,26 +53,26 @@ public class ProcessLogProc implements aurora.sqlje.core.ISqlCallEnabled {
 		public String event_type;
 		public String log_content;
 		@InsertExpression("CURRENT_TIMESTAMP")
-		public java.sql.Date log_date;
+		public Date log_date;
 	}
 
-	protected aurora.sqlje.core.IInstanceManager _$sqlje_instanceManager = null;
-	protected aurora.sqlje.core.ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected IInstanceManager _$sqlje_instanceManager = null;
 	protected SqlFlag $sql = new SqlFlag(this);
 
-	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
+	public ISqlCallStack getSqlCallStack() {
 		return _$sqlje_sqlCallStack;
 	}
 
-	public aurora.sqlje.core.IInstanceManager getInstanceManager() {
+	public void _$setSqlCallStack(ISqlCallStack args0) {
+		_$sqlje_sqlCallStack = args0;
+	}
+
+	public IInstanceManager getInstanceManager() {
 		return _$sqlje_instanceManager;
 	}
 
-	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
+	public void _$setInstanceManager(IInstanceManager args0) {
 		_$sqlje_instanceManager = args0;
-	}
-
-	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
-		_$sqlje_sqlCallStack = args0;
 	}
 }

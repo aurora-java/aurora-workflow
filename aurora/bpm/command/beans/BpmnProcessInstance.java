@@ -11,6 +11,7 @@ public class BpmnProcessInstance {
 	public Long parent_id;
 	public String process_code;
 	public String process_version;
+	public String scope_id;
 	public String description;
 	public Long instance_param;
 	/** 创建日期 */

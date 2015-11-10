@@ -8,7 +8,7 @@ import aurora.sqlje.exception.*;
 import java.util.Map;
 import aurora.sqlje.core.*;
 
-public class ProceedProc implements aurora.sqlje.core.ISqlCallEnabled {
+public class ProceedProc implements ISqlCallEnabled {
 	public void proceed(Long instance_id, Long path_id) throws Exception {
 		String _$sqlje_sql_gen3 = "select * from bpm_path_instance where instance_id=? and path_id=?";
 		PreparedStatement _$sqlje_ps_gen2 = getSqlCallStack()
@@ -34,28 +34,28 @@ public class ProceedProc implements aurora.sqlje.core.ISqlCallEnabled {
 			ResultSet _$sqlje_rs_gen1 = _$sqlje_ps_gen4.getResultSet();
 			getSqlCallStack().push(_$sqlje_rs_gen1);
 			getSqlCallStack().push(_$sqlje_ps_gen4);
-			BpmnProcessInstance instance = DataTransfer.transfer1(
-					BpmnProcessInstance.class, _$sqlje_rs_gen1);
+			BpmnProcessInstance instance = DataTransfer
+					.transfer1(BpmnProcessInstance.class, _$sqlje_rs_gen1);
 		}
 	}
 
-	protected aurora.sqlje.core.IInstanceManager _$sqlje_instanceManager = null;
-	protected aurora.sqlje.core.ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected ISqlCallStack _$sqlje_sqlCallStack = null;
+	protected IInstanceManager _$sqlje_instanceManager = null;
 	protected SqlFlag $sql = new SqlFlag(this);
 
-	public aurora.sqlje.core.ISqlCallStack getSqlCallStack() {
+	public ISqlCallStack getSqlCallStack() {
 		return _$sqlje_sqlCallStack;
 	}
 
-	public aurora.sqlje.core.IInstanceManager getInstanceManager() {
+	public void _$setSqlCallStack(ISqlCallStack args0) {
+		_$sqlje_sqlCallStack = args0;
+	}
+
+	public IInstanceManager getInstanceManager() {
 		return _$sqlje_instanceManager;
 	}
 
-	public void _$setInstanceManager(aurora.sqlje.core.IInstanceManager args0) {
+	public void _$setInstanceManager(IInstanceManager args0) {
 		_$sqlje_instanceManager = args0;
-	}
-
-	public void _$setSqlCallStack(aurora.sqlje.core.ISqlCallStack args0) {
-		_$sqlje_sqlCallStack = args0;
 	}
 }
