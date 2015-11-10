@@ -1,5 +1,6 @@
 package aurora.bpm.command;
 
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.ScriptTask;
 
 import aurora.bpm.script.BPMScriptEngine;
@@ -19,9 +20,10 @@ public class ScriptTaskExecutor extends AbstractCommandExecutor {
 			throws Exception {
 		super.executeWithSqlCallStack(callStack, cmd);
 		String node_id = cmd.getOptions().getString(NODE_ID);
-		org.eclipse.bpmn2.Process process = getProcess(loadDefinitions(cmd,
+		org.eclipse.bpmn2.Process process = getRootProcess(loadDefinitions(cmd,
 				callStack));
-		ScriptTask st = findFlowElementById(process, node_id, ScriptTask.class);
+		FlowElementsContainer container = findFlowElementContainerById(process, cmd.getOptions().getString(SCOPE_ID));
+		ScriptTask st = findFlowElementById(container, node_id, ScriptTask.class);
 		String script = st.getScript();
 		if (script != null && script.length() > 0) {
 			BPMScriptEngine engine = prepareScriptEngine(callStack, cmd);

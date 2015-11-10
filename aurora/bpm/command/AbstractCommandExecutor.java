@@ -6,36 +6,38 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.eclipse.bpmn2.Definitions;
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.emf.ecore.EObject;
-import org.json.JSONObject;
 
-import uncertain.composite.CompositeMap;
-import uncertain.composite.JSONAdaptor;
 import aurora.bpm.command.beans.BpmnProcessData;
 import aurora.bpm.command.beans.BpmnProcessInstance;
 import aurora.bpm.command.sqlje.InstanceProc;
 import aurora.bpm.command.sqlje.PathProc;
+import aurora.bpm.define.FlowElement;
 import aurora.bpm.engine.ExecutorContext;
 import aurora.bpm.queue.ICommandQueue;
 import aurora.bpm.script.BPMScriptEngine;
 import aurora.database.service.IDatabaseServiceFactory;
+import aurora.plugin.script.scriptobject.ScriptShareObject;
 import aurora.sqlje.core.ISqlCallEnabled;
 import aurora.sqlje.core.ISqlCallStack;
 import aurora.sqlje.core.SqlCallStack;
+import uncertain.composite.CompositeMap;
 
 public abstract class AbstractCommandExecutor implements ICommandExecutor {
 
 	public static final String INSTANCE_ID = "instance_id";
 	public static final String PROCESS_CODE = "process_code";
 	public static final String PROCESS_VERSION = "process_version";
+	public static final String SCOPE_ID = "scope_id";
 	public static final String RECORD_ID = "record_id";
 	public static final String USER_ID = "user_id";
-	public static final String[] STANDARD_PROPERTIES = {
-			ICommandQueue.QUEUE_ID, INSTANCE_ID, PROCESS_CODE, PROCESS_VERSION,
-			RECORD_ID, USER_ID };
+	public static final String[] STANDARD_PROPERTIES = { ICommandQueue.QUEUE_ID,
+			INSTANCE_ID, PROCESS_CODE, SCOPE_ID, PROCESS_VERSION, RECORD_ID,
+			USER_ID };
 	public static final String NODE_ID = "node_id";
 	public static final String PATH_ID = "path_id";
 	public static final String SEQUENCE_FLOW_ID = "sequence_flow_id";
@@ -91,7 +93,7 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 	@Override
 	public void execute(Command cmd) throws Exception {
 		ISqlCallStack callStack = createSqlCallStack();
-		CompositeMap session=callStack.getContextData().getChild("session");
+		CompositeMap session = callStack.getContextData().getChild("session");
 		session.put("user_id", cmd.getOptions().getString("user_id"));
 		session.put("lang", cmd.getOptions().getString("lang"));
 		try {
@@ -102,6 +104,7 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 				BpmnProcessInstance bpi = inst.query(instance_id);
 				cmd.getOptions().put(PROCESS_CODE, bpi.process_code);
 				cmd.getOptions().put(PROCESS_VERSION, bpi.process_version);
+				cmd.getOptions().put(SCOPE_ID, bpi.scope_id);
 				running = eq(bpi.status, "RUNNING");
 				if (running) {
 					loadDataObject(inst, instance_id, callStack);
@@ -112,7 +115,8 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 			}
 			if (running && canExecute(callStack, cmd)) {
 				executeWithSqlCallStack(callStack, cmd);
-				saveDataObject(callStack, cmd.getOptions().getLong(INSTANCE_ID));
+				saveDataObject(callStack,
+						cmd.getOptions().getLong(INSTANCE_ID));
 			}
 			callStack.commit();
 		} catch (Exception e) {
@@ -128,33 +132,30 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 		// prepare data_object($data)
 		BpmnProcessData data = ci.getProcessData(instance_id);
 		if (data != null) {
-			CompositeMap map;
-			if (data.data_object == null || data.data_object.length() == 0)
-				map = new CompositeMap();
-			else {
-				JSONObject dataMap = new JSONObject(data.data_object);
-				map = JSONAdaptor.toMap(dataMap);
-			}
-			map.setName(BPMScriptEngine.DATA_OBJECT);
-			// put data_object to context(if it not exists)
-			callStack.getContextData().addChild(map);
+			callStack.getContextData().put("$json", data.data_object);
 		}
-		//
 	}
 
 	private void saveDataObject(ISqlCallStack callStack, Long instance_id)
 			throws Exception {
 		// save data_object
-		CompositeMap map = callStack.getContextData().getChild(
-				BPMScriptEngine.DATA_OBJECT);
-		if (map != null) {
-			BpmnProcessData data = new BpmnProcessData();
-			data.instance_id = instance_id;
-			JSONObject jsonobj = JSONAdaptor.toJSONObject(map);
-			data.data_object = jsonobj.toString();
-			InstanceProc inst = createProc(InstanceProc.class, callStack);
-			inst.saveDataObject(data);
+		ScriptShareObject sso = (ScriptShareObject) callStack.getContextData()
+				.get(BPMScriptEngine.KEY_SSO);
+		if (sso == null) {
+			// engine not use
+			return;
 		}
+		BPMScriptEngine engine = (BPMScriptEngine) sso.getEngine();
+		if (engine == null) {
+			// engine not initialize
+			return;
+		}
+		Object obj = engine.eval("JSON.stringify($ctx.data||{})");
+		BpmnProcessData data = new BpmnProcessData();
+		data.instance_id = instance_id;
+		data.data_object = obj.toString();
+		InstanceProc inst = createProc(InstanceProc.class, callStack);
+		inst.saveDataObject(data);
 	}
 
 	protected boolean canExecute(ISqlCallStack callStack, Command cmd) {
@@ -169,8 +170,8 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 
 	protected BPMScriptEngine prepareScriptEngine(ISqlCallStack callStack,
 			Command cmd) {
-		BPMScriptEngine engine = getExecutorContext().createScriptEngine(
-				callStack.getContextData());
+		BPMScriptEngine engine = getExecutorContext()
+				.createScriptEngine(callStack.getContextData());
 		engine.registry("callStack", callStack);
 		engine.registry("command", cmd);
 		return engine;
@@ -192,7 +193,7 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 		}
 	}
 
-	protected org.eclipse.bpmn2.Definitions loadDefinitions(String code,
+	protected Definitions loadDefinitions(String code,
 			String version, ISqlCallStack callStack) throws Exception {
 		return getExecutorContext().getDefinitionFactory().loadDefinition(code,
 				version, callStack);
@@ -200,8 +201,8 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 
 	protected Definitions loadDefinitions(Command cmd, ISqlCallStack callStack)
 			throws Exception {
-		return loadDefinitions(cmd.getOptions().getString(PROCESS_CODE), cmd
-				.getOptions().getString(PROCESS_VERSION), callStack);
+		return loadDefinitions(cmd.getOptions().getString(PROCESS_CODE),
+				cmd.getOptions().getString(PROCESS_VERSION), callStack);
 	}
 
 	protected <T extends ISqlCallEnabled> T createProc(Class<T> clazz,
@@ -221,7 +222,7 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 	 * copy <code>STANDARD_PROPERTIES</code> from <code>cmd0</code>
 	 * 
 	 * @param cmd0
-	 * @return {@link STANDARD_PROPERTIES}
+	 * @return {@code STANDARD_PROPERTIES}
 	 */
 	protected CompositeMap createOptionsWithStandardInfo(Command cmd0) {
 		CompositeMap map = new CompositeMap();
@@ -268,8 +269,8 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 			Command cmd) throws Exception {
 		PathProc cp = createProc(PathProc.class, callStack);
 		Long instance_id = cmd.getOptions().getLong(INSTANCE_ID);
-		Long path_id = cp.create(instance_id, sf.getSourceRef().getId(), sf
-				.getTargetRef().getId(), sf.getId());
+		Long path_id = cp.create(instance_id, sf.getSourceRef().getId(),
+				sf.getTargetRef().getId(), sf.getId());
 		System.out.printf("path <%s> created ,id:%d\n", sf.getId(), path_id);
 
 		cp.createPathLog(instance_id, path_id, 1L, sf.getSourceRef().getId(),
@@ -284,32 +285,64 @@ public abstract class AbstractCommandExecutor implements ICommandExecutor {
 	}
 
 	/**
-	 * get process from definitions
+	 * get the root process from definitions
 	 * 
 	 * @param def
 	 * @return
 	 */
-	protected org.eclipse.bpmn2.Process getProcess(Definitions def) {
+	protected Process getRootProcess(Definitions def) {
 		List<EObject> contents = def.eContents();
 		for (EObject eo : contents) {
-			if (eo instanceof org.eclipse.bpmn2.Process)
+			if (eo instanceof Process)
 				return (Process) eo;
 		}
 		return null;
 
 	}
 
+	/**
+	 * find a FlowElementContainer (usually a sub-process)
+	 * 
+	 * @param container
+	 * @param id
+	 * @return
+	 */
+	protected FlowElementsContainer findFlowElementContainerById(
+			FlowElementsContainer container, String id) {
+		if (eq(container.getId(), id)) {
+			return container;
+		}
+		for (org.eclipse.bpmn2.FlowElement fe : container.getFlowElements()) {
+			if ((fe instanceof FlowElementsContainer)) {
+				if (eq(fe.getId(), id))
+					return (FlowElementsContainer) fe;
+				return findFlowElementContainerById((FlowElementsContainer) fe,
+						id);
+			}
+		}
+		return null;
+	}
+
 	protected org.eclipse.bpmn2.FlowElement findFlowElementById(
-			org.eclipse.bpmn2.Process process, String id) {
-		for (org.eclipse.bpmn2.FlowElement fe : process.getFlowElements())
+			FlowElementsContainer container, String id) {
+		for (org.eclipse.bpmn2.FlowElement fe : container.getFlowElements())
 			if (eq(fe.getId(), id))
 				return fe;
 		return null;
 	}
 
+	/**
+	 * find a specified FlowElement with id and given type<br>
+	 * search children only,no recursive
+	 * 
+	 * @param container
+	 * @param id
+	 * @param type
+	 * @return FlowElement cast to given type
+	 */
 	protected <T extends org.eclipse.bpmn2.FlowElement> T findFlowElementById(
-			org.eclipse.bpmn2.Process process, String id, Class<T> type) {
-		for (org.eclipse.bpmn2.FlowElement fe : process.getFlowElements())
+			FlowElementsContainer container, String id, Class<T> type) {
+		for (org.eclipse.bpmn2.FlowElement fe : container.getFlowElements())
 			if (fe != null && type.isAssignableFrom(fe.getClass())
 					& eq(fe.getId(), id))
 				return (T) fe;
